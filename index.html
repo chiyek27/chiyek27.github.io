@@ -1,208 +1,54 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>chiyek27 — GitHub Pages Explorer</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>chiyek27.github.io</title>
   <style>
-    :root{
-      --bg:#f6f7fb;--card:#fff;--border:#e5e7eb;--muted:#6b7280;--pill:#111827;--radius:14px
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:#111827;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    header{max-width:1100px;margin:20px auto 0;padding:0 16px}
-    h1{margin:0 0 6px;font-size:22px}
-    .sub{color:var(--muted);font-size:14px}
-    .tabs{display:flex;gap:8px;margin:14px 0}
-    .tab{border:1px solid var(--border);background:#fff;padding:8px 12px;border-radius:999px;cursor:pointer;font-size:14px}
-    .tab.active{background:#111827;color:#fff;border-color:#111827}
-    main{max-width:1100px;margin:0 auto 40px;padding:0 16px}
-    section{display:none}
-    section.active{display:block}
-    /* Explorer styles */
-    .toolbar{display:flex;gap:8px;align-items:center;margin:12px 0}
-    button{border:1px solid var(--border);background:#fff;padding:8px 12px;border-radius:10px;cursor:pointer}
-    button[disabled]{opacity:.6;cursor:not-allowed}
-    #breadcrumb{font-size:14px;color:#374151;word-break:break-all}
-    .list{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 20px rgba(0,0,0,.04);overflow:hidden}
-    .row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:12px 16px;border-bottom:1px solid #f1f1f1;align-items:center}
-    .row:last-child{border-bottom:none}
-    .name{display:flex;align-items:center;gap:10px;min-width:0}
-    .name b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);color:#374151}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
-    .pill{display:inline-block;text-decoration:none;border:1px solid var(--border);background:#fff;padding:6px 10px;border-radius:999px;font-size:13px}
-    .pill:hover{background:#f9fafb}
-    .empty{padding:24px;text-align:center;color:var(--muted);font-style:italic}
-    /* Repo list styles */
-    .controls{display:grid;grid-template-columns:1fr 160px 180px;gap:10px;margin:12px 0}
-    input[type="search"],select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;outline:none}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 20px rgba(0,0,0,.035)}
-    .title{display:flex;gap:8px;align-items:center}
-    .badge{border:1px solid var(--border);border-radius:999px;padding:2px 8px;font-size:12px;color:#374151;background:#fff}
-    .desc{color:#374151;font-size:14px;min-height:38px}
-    .meta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
-    footer{text-align:center;padding:12px;color:var(--muted);font-size:12px}
-    @media (max-width:640px){.controls{grid-template-columns:1fr}}
+    body { margin:24px; font:15px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    a { color:inherit; text-decoration:none } a:hover{ text-decoration:underline }
+    .line { white-space:pre }
   </style>
 </head>
 <body>
-  <header>
-    <h1>📚 chiyek27 — GitHub Pages Explorer</h1>
-    <div class="sub">Jelajahi isi repo halaman (user site) dan daftar semua repos kamu dalam satu halaman.</div>
-    <div class="tabs">
-      <button class="tab active" data-tab="explorer">📂 Explorer (user site)</button>
-      <button class="tab" data-tab="repos">📦 Semua Repo</button>
-    </div>
-  </header>
-
-  <main>
-    <!-- TAB 1: EXPLORER -->
-    <section id="explorer" class="active">
-      <div id="breadcrumb">/</div>
-      <div class="toolbar">
-        <button id="backBtn" title="Kembali satu level">⬅️ Back</button>
-        <span class="sub">Klik folder untuk membuka isinya. “Live Demo” muncul otomatis jika folder punya <code>index.html</code>.</span>
-      </div>
-      <div id="list" class="list"><div class="row"><div class="name">Memuat…</div></div></div>
-      <div id="emptyExp" class="empty" style="display:none;">Folder kosong.</div>
-    </section>
-
-    <!-- TAB 2: ALL REPOS -->
-    <section id="repos">
-      <div class="controls">
-        <input id="q" type="search" placeholder="Cari nama/desk/tema… (mis. figma, card, blog)" />
-        <select id="lang"><option value="">Semua bahasa</option></select>
-        <select id="sort"><option value="updated">Urut: Terbaru diperbarui</option><option value="name">Urut: Nama (A–Z)</option><option value="stars">Urut: ★ Stars</option></select>
-      </div>
-      <div id="grid" class="grid"></div>
-      <div id="emptyRepo" class="empty" style="display:none;">Tidak ada repo yang cocok dengan filter.</div>
-    </section>
-  </main>
-
-  <footer>
-    Tanpa token (rate limit publik ~60 request/jam). Halaman ini melakukan sedikit panggilan API, biasanya aman.
-  </footer>
+  <div id="root" class="line">📚 <strong>chiyek27.github.io</strong></div>
+  <div id="list" class="line">memuat…</div>
 
   <script>
-    // ====== KONFIGURASI ======
-    const USER = "chiyek27";                 // ganti jika diperlukan
-    const REPO = `${USER}.github.io`;          // user site repo
+    const USER = "chiyek27";
+    const BASE = `https://${USER}.github.io`;
 
-    // ====== TAB SWITCHER ======
-    const tabs = document.querySelectorAll('.tab');
-    const sections = { explorer: document.getElementById('explorer'), repos: document.getElementById('repos') };
-    function setTab(name){
-      tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
-      Object.keys(sections).forEach(k=>sections[k].classList.toggle('active', k===name));
-      location.hash = name; // deep link
+    async function gh(url){
+      const r = await fetch(url, { headers: { "Accept":"application/vnd.github+json" }});
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
     }
-    tabs.forEach(t=>t.addEventListener('click', ()=> setTab(t.dataset.tab)));
-    // on load by hash
-    if(location.hash.replace('#','')==='repos') setTab('repos');
+    function branch(i, n){ return (i === n - 1) ? "└── " : "├── "; }
 
-    // ====== TAB 1: EXPLORER (repo contents) ======
-    (function(){
-      const API   = `https://api.github.com/repos/${USER}/${REPO}/contents`;
-      let pathStack = [""];
-      const elList = document.getElementById("list");
-      const elEmpty = document.getElementById("emptyExp");
-      const elBreadcrumb = document.getElementById("breadcrumb");
-      const elBack = document.getElementById("backBtn");
+    (async function render(){
+      const el = document.getElementById("list");
+      try{
+        // Ambil sampai 100 repo milik user, lalu filter yang has_pages = true
+        const repos = await gh(`https://api.github.com/users/${USER}/repos?per_page=100&type=owner`);
+        const live = repos
+          .filter(r => r.has_pages && r.name.toLowerCase() !== `${USER}.github.io`) // exclude user-site repo
+          .map(r => r.name)
+          .sort((a,b)=> a.localeCompare(b)); // urut alfabet
 
-      elBack.addEventListener("click", () => {
-        if (pathStack.length > 1) { pathStack.pop(); renderCurrent(); }
-      });
-      function currentPath(){ return pathStack[pathStack.length-1]; }
-      function toLiveUrl(path){
-        const base = `https://${USER}.github.io`;
-        if (!path) return `${base}/`;
-        return `${base}/${path}`;
-      }
-      function setBreadcrumb(path){
-        const parts = path.split("/").filter(Boolean);
-        let acc = ""; const nodes = ['<a href="#" data-path="">/</a>'];
-        parts.forEach((p,i)=>{ acc += (i?"/":"")+p; nodes.push(`<span> / </span><a href="#" data-path="${acc}">${p}</a>`); });
-        elBreadcrumb.innerHTML = nodes.join("");
-        elBreadcrumb.querySelectorAll('a[data-path]').forEach(a=>{
-          a.addEventListener('click', e=>{ e.preventDefault(); const target=a.getAttribute('data-path'); pathStack=[""]; if(target){ const seg=target.split('/').filter(Boolean); seg.forEach((_,i)=> pathStack.push(seg.slice(0,i+1).join('/')));} renderCurrent(); });
-        });
-      }
-      async function fetchDir(path=""){ const url = path? `${API}/${encodeURIComponent(path)}`: API; const r = await fetch(url); if(!r.ok) throw new Error(`HTTP ${r.status}`); const j = await r.json(); return Array.isArray(j)? j.sort((a,b)=> a.type===b.type? a.name.localeCompare(b.name) : (a.type==='dir'?-1:1) ): []; }
-      async function folderHasIndexHtml(path){ try{ const items = await fetchDir(path); return items.some(x=> x.type==='file' && x.name.toLowerCase()==='index.html'); }catch{return false;} }
-      async function render(path=""){ setBreadcrumb(path); elEmpty.style.display='none'; elList.innerHTML = `<div class="row"><div class="name">Memuat…</div></div>`;
-        try{
-          const items = await fetchDir(path);
-          if(!items.length){ elList.innerHTML=""; elEmpty.style.display='block'; return; }
-          const rows = await Promise.all(items.map(async it=>{
-            if(it.type==='dir'){
-              const livePossible = await folderHasIndexHtml(it.path);
-              const liveHref = toLiveUrl(`${it.path}/`);
-              return `
-                <div class="row">
-                  <div class="name"><span>📁</span><b>${it.name}</b><span class="tag">folder</span></div>
-                  <div class="actions">
-                    ${livePossible?`<a class="pill" href="${liveHref}" target="_blank" rel="noopener">▶️ Live Demo</a>`:""}
-                    <a class="pill" href="${it.html_url}" target="_blank" rel="noopener">GitHub</a>
-                    <a class="pill" href="#" data-open="${it.path}">Telusuri</a>
-                  </div>
-                </div>`;
-            } else {
-              const view = it.download_url || it.html_url; const live = toLiveUrl(it.path); const isHtml = /\.html?$/i.test(it.name);
-              return `
-                <div class="row">
-                  <div class="name"><span>📄</span><b>${it.name}</b><span class="tag">file</span></div>
-                  <div class="actions">
-                    ${isHtml?`<a class="pill" href="${live}" target="_blank" rel="noopener">Open</a>`:""}
-                    <a class="pill" href="${view}" target="_blank" rel="noopener">View</a>
-                    <a class="pill" href="${it.html_url}" target="_blank" rel="noopener">GitHub</a>
-                  </div>
-                </div>`;
-            }
-          }));
-          elList.innerHTML = rows.join("");
-          elList.querySelectorAll('[data-open]').forEach(a=> a.addEventListener('click', e=>{ e.preventDefault(); pathStack.push(a.getAttribute('data-open')); renderCurrent(); }));
-        }catch(e){ elList.innerHTML = `<div class=\"row\"><div class=\"name\">❌ Gagal memuat (${e.message}).</div></div>`; }
-      }
-      function renderCurrent(){ render(currentPath()); elBack.disabled = pathStack.length<=1; }
-      renderCurrent();
-    })();
+        if(!live.length){
+          el.textContent = "(belum ada Project Pages aktif)";
+          return;
+        }
 
-    // ====== TAB 2: SEMUA REPO ======
-    ;(function(){
-      const API  = `https://api.github.com/users/${USER}/repos?per_page=100&type=owner&sort=updated`;
-      const PAGES_ROOT = `https://${USER}.github.io`;
-      const elGrid = document.getElementById('grid');
-      const elEmpty = document.getElementById('emptyRepo');
-      const elQ = document.getElementById('q');
-      const elLang = document.getElementById('lang');
-      const elSort = document.getElementById('sort');
-      let repos = []; const langSet = new Set();
-      function humanDate(iso){ const d=new Date(iso); return d.toLocaleString(undefined,{year:'numeric',month:'short',day:'2-digit'}); }
-      function pagesUrl(repo){ if(repo.name.toLowerCase()===`${USER}.github.io`.toLowerCase()) return `${PAGES_ROOT}/`; if(repo.has_pages) return `${PAGES_ROOT}/${repo.name}/`; return null; }
-      function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#039;'}[c])); }
-      function normalizeUrl(u){ try{ return /^\w+:\/\//.test(u)? u : `https://${u}`; }catch{ return u; } }
-      function matchesQuery(repo, q){ if(!q) return true; q=q.toLowerCase(); const fields=[repo.name||'',repo.description||'',(repo.topics||[]).join(' ')].join(' ').toLowerCase(); return fields.includes(q); }
-      function matchesLang(repo, lang){ if(!lang) return true; return (repo.language||'').toLowerCase()===lang.toLowerCase(); }
-      function sortRepos(list, mode){ const a=list.slice(); if(mode==='name') a.sort((x,y)=>x.name.localeCompare(y.name)); else if(mode==='stars') a.sort((x,y)=>(y.stargazers_count||0)-(x.stargazers_count||0)); else a.sort((x,y)=> new Date(y.pushed_at)-new Date(x.pushed_at)); return a; }
-      function buildLangFilter(){ const langs=Array.from(langSet).filter(Boolean).sort((a,b)=>a.localeCompare(b)); elLang.innerHTML=['<option value="">Semua bahasa</option>',...langs.map(l=>`<option value="${l}">${l}</option>`)].join(''); }
-      function render(){ const q=elQ.value.trim(); const lang=elLang.value; const mode=elSort.value; const filtered = sortRepos(repos.filter(r=>matchesQuery(r,q)&&matchesLang(r,lang)), mode); if(!filtered.length){ elGrid.innerHTML=''; elEmpty.style.display='block'; return;} elEmpty.style.display='none'; elGrid.innerHTML = filtered.map(repo=>{ const isUserSite = repo.name.toLowerCase()===`${USER}.github.io`.toLowerCase(); const live = pagesUrl(repo); const topics=(repo.topics||[]).slice(0,6); const langBadge = repo.language? `<span class="badge">${repo.language}</span>`:''; const star = repo.stargazers_count? `★ ${repo.stargazers_count}`:''; const fork = repo.forks_count? `⑂ ${repo.forks_count}`:''; const counts=[star,fork].filter(Boolean).join(' · '); const updated = repo.pushed_at? `Updated ${humanDate(repo.pushed_at)}`:''; return `
-          <article class="card">
-            <div class="title"><strong>${isUserSite?'🏠 ':'📦 '}${repo.name}</strong>${langBadge}</div>
-            <div class="desc">${repo.description? escapeHtml(repo.description):'<span class="sub">Tidak ada deskripsi.</span>'}</div>
-            <div class="meta">${counts?`<span>${counts}</span>`:''}${updated?`<span>${updated}</span>`:''}</div>
-            <div class="actions">
-              ${live?`<a class="pill" href="${live}" target="_blank" rel="noopener">▶️ Live Demo</a>`:''}
-              <a class="pill" href="${repo.html_url}" target="_blank" rel="noopener">GitHub</a>
-              ${repo.homepage?`<a class="pill" href="${normalizeUrl(repo.homepage)}" target="_blank" rel="noopener">Homepage</a>`:''}
-              <a class="pill" href="https://raw.githubusercontent.com/${USER}/${repo.name}/${repo.default_branch||'main'}/README.md" target="_blank" rel="noopener">README (raw)</a>
-            </div>
-            ${topics.length?`<div class="meta">${topics.map(t=>`<span class="badge">#${t}</span>`).join(' ')}</div>`:''}
-          </article>`; }).join(''); }
-      async function init(){ try{ elGrid.innerHTML = '<div class="empty">Memuat daftar repos…</div>'; const res = await fetch(API,{headers:{'Accept':'application/vnd.github+json'}}); if(!res.ok) throw new Error(`HTTP ${res.status}`); repos = await res.json(); repos.forEach(r=>{ if(r.language) langSet.add(r.language); }); buildLangFilter(); render(); }catch(e){ elGrid.innerHTML = `<div class="empty">❌ Gagal memuat repos (${e.message}).</div>`; } }
-      elQ.addEventListener('input', render); elLang.addEventListener('change', render); elSort.addEventListener('change', render);
-      init();
+        // Bentuk tree sederhana
+        const lines = live.map((name, i) =>
+          `${branch(i, live.length)}📂<a href="${BASE}/${encodeURIComponent(name)}/">${name}/</a>`
+        );
+        el.innerHTML = lines.join("\n");
+      }catch(e){
+        document.getElementById("root").textContent = "📚 chiyek27.github.io";
+        el.textContent = `❌ Gagal memuat (${e.message})`;
+      }
     })();
   </script>
 </body>
